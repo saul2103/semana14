@@ -1,4 +1,5 @@
 class Producto:
+    # Guarda la informacion basica de cada producto.
     def __init__(self, codigo, nombre, precio):
         self.codigo = codigo
         self.nombre = nombre
@@ -6,7 +7,7 @@ class Producto:
 
     @staticmethod
     def validar_texto(valor, campo):
-        # Reutiliza una validacion basica para datos obligatorios.
+        # Revisa que el dato tenga algun contenido.
         if not valor or not valor.strip():
             raise ValueError(f"El campo {campo} no puede estar vacio.")
 
@@ -18,6 +19,7 @@ class Producto:
 
     @codigo.setter
     def codigo(self, valor):
+        # Guarda el codigo despues de revisarlo.
         self._codigo = self.validar_texto(valor, "codigo")
 
     @property
@@ -26,6 +28,7 @@ class Producto:
 
     @nombre.setter
     def nombre(self, valor):
+        # Guarda el nombre despues de revisarlo.
         self._nombre = self.validar_texto(valor, "nombre")
 
     @property
@@ -34,6 +37,14 @@ class Producto:
 
     @precio.setter
     def precio(self, valor):
+        # Convierte el precio y evita valores negativos.
+        if isinstance(valor, str):
+            valor = valor.strip().replace(",", ".")
+            try:
+                valor = float(valor)
+            except ValueError:
+                raise ValueError("El precio debe ser un número válido.")
+
         if not isinstance(valor, (int, float)) or valor < 0:
             raise ValueError("El precio debe ser un número positivo.")
-        self._precio = valor
+        self._precio = float(valor)

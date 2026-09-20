@@ -3,6 +3,7 @@ from modelos.usuario import Usuario
 
 
 class RestauranteServicio:
+    # Reune las acciones principales del restaurante.
     def __init__(self, archivo_servicio):
         self.archivo_servicio = archivo_servicio
         self.usuarios = []
@@ -10,7 +11,7 @@ class RestauranteServicio:
         self.cargar_datos()
 
     def cargar_datos(self):
-        # Carga los datos persistidos y los convierte en objetos.
+        # Trae los datos guardados y crea sus objetos.
         usuarios_json = self.archivo_servicio.leer_json("usuarios.json")
         productos_json = self.archivo_servicio.leer_json("productos.json")
 
@@ -34,7 +35,7 @@ class RestauranteServicio:
         ]
 
     def validar_acceso(self, usuario, contrasena):
-        # Verifica si las credenciales coinciden con un usuario cargado.
+        # Busca si los datos de acceso son correctos.
         for usuario_registrado in self.usuarios:
             if (
                 usuario_registrado.usuario == usuario
@@ -45,15 +46,74 @@ class RestauranteServicio:
         return None
 
     def cantidad_usuarios(self):
+        # Cuenta las personas registradas.
         return len(self.usuarios)
 
     def cantidad_productos(self):
+        # Cuenta los productos registrados.
         return len(self.productos)
 
     def listar_usuarios(self):
-        # Entrega los usuarios cargados para mostrarlos en la interfaz.
+        # Devuelve los usuarios para mostrarlos en pantalla.
         return self.usuarios
 
     def listar_productos(self):
-        # Entrega los productos cargados para mostrarlos en la interfaz.
+        # Devuelve los productos para mostrarlos en pantalla.
         return self.productos
+
+    def guardar_productos(self):
+        # Guarda la lista actual de productos.
+        datos= [
+            {
+                "codigo": producto.codigo,
+                "nombre": producto.nombre,
+                "precio": producto.precio,
+            }
+            for producto in self.productos
+        ]
+        self.archivo_servicio.escribir_json("productos.json", datos)
+
+    def buscar_producto_por_codigo(self, codigo):
+        # Busca un producto usando su codigo.
+        codigo=codigo.strip()  # Elimina espacios en blanco al inicio y al final
+
+        for producto in self.productos:
+            if producto.codigo == codigo:
+                return producto
+        return None
+
+    def registrar_producto(self, codigo, nombre, precio):
+        # Crea un producto nuevo y lo guarda.
+        nuevo_producto = Producto(codigo, nombre, precio)
+        if self.buscar_producto_por_codigo(nuevo_producto.codigo) is not None:
+            raise ValueError(f"Ya existe un producto con ese codigo.")
+
+        self.productos.append(nuevo_producto)
+        self.guardar_productos()
+        return nuevo_producto
+
+    def actualizar_producto(self, codigo, nombre, precio):
+        # Cambia los datos de un producto existente.
+        producto_actual = self.buscar_producto_por_codigo(codigo)
+
+        if producto_actual is None:
+            raise ValueError(f"No existe un producto con ese codigo.")
+
+        datos_validados = Producto(codigo, nombre, precio)
+        producto_actual.codigo = datos_validados.codigo
+        producto_actual.nombre = datos_validados.nombre
+        producto_actual.precio = datos_validados.precio
+        self.guardar_productos()
+        return producto_actual
+
+    def eliminar_producto(self, codigo):
+        # Quita un producto y guarda el cambio.
+        producto_actual= self.buscar_producto_por_codigo(codigo)
+
+        if producto_actual is None:
+            raise ValueError(f"No existe un producto con ese codigo.")
+
+        self.productos.remove(producto_actual)
+        self.guardar_productos()
+        return producto_actual
+    

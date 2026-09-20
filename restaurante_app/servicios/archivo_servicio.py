@@ -3,11 +3,13 @@ from pathlib import Path
 
 
 class ArchivoServicio:
+    # Se encarga de leer y guardar los datos del proyecto.
     def __init__(self, carpeta_datos):
         self.carpeta_datos = Path(carpeta_datos)
         self.carpeta_datos.mkdir(parents=True, exist_ok=True)
 
     def leer_json(self, nombre_archivo):
+        # Lee un archivo y devuelve una lista de datos.
         ruta = self.carpeta_datos / nombre_archivo
 
         if not ruta.exists():
@@ -31,6 +33,7 @@ class ArchivoServicio:
             return []
 
     def escribir_json(self, nombre_archivo, datos):
+        # Guarda los datos actuales en formato JSON.
         ruta = self.carpeta_datos / nombre_archivo
         ruta.parent.mkdir(parents=True, exist_ok=True)
 

@@ -1,8 +1,10 @@
+from pathlib import Path
 import tkinter as tk
 from tkinter import ttk
 
 
 class loginview(tk.Frame):
+    # Muestra el formulario para entrar a la aplicacion.
     def __init__(self, master, restaurante_servicio, al_inicar_sesion):
         super().__init__(master)
         self.restaurante_servicio = restaurante_servicio
@@ -15,7 +17,22 @@ class loginview(tk.Frame):
         self.definir_estilos()
         self.construir_interfaz()
 
+    def cargar_logo(self):
+        # Busca el logo y lo prepara para mostrarlo arriba.
+        ruta_base = Path(__file__).resolve().parent.parent
+        ruta_logo = ruta_base / "assets" / "logo" / "restaurante.png"
+
+        if not ruta_logo.exists():
+            return None
+
+        logo_original=tk.PhotoImage(file=str(ruta_logo))
+        self.logo = logo_original.subsample(3, 3)
+        return self.logo
+    
+
+
     def definir_estilos(self):
+        # Define la apariencia del boton de entrada.
         estilo = ttk.Style()
         estilo.theme_use("clam")
         estilo.configure(
@@ -29,9 +46,18 @@ class loginview(tk.Frame):
         estilo.map("Login.TButton", background=[("active", "#1d4ed8")])
 
     def construir_interfaz(self):
-        # Construye los componentes visuales del login que vamos a mostrar en la ventana principal.
+        # Arma los campos y el boton del formulario.
         contenedor = tk.Frame(self, bg="#ffffff", padx=32, pady=28)
         contenedor.place(relx=0.5, rely=0.5, anchor="center")
+
+        logo = self.cargar_logo()
+        if logo is not None:
+            tk.Label(
+                contenedor,
+                image=logo,
+                bg="#ffffff",
+            ).pack(pady=(0, 12))
+
 
         titulo = tk.Label(
             contenedor,
@@ -98,7 +124,7 @@ class loginview(tk.Frame):
         boton.pack(fill="x")
 
     def iniciar_sesion(self):
-        # Obtiene los valores escritos y solicita la validacion al servicio.
+        # Lee los datos y revisa si el usuario puede entrar.
         assert self.usuario_entry is not None
         assert self.contrasena_entry is not None
         assert self.mensaje_error is not None
